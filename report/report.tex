@@ -1,0 +1,90 @@
+\documentclass[10pt,conference,compsocconf,a4paper]{IEEEtran}
+
+\usepackage{graphicx}
+\usepackage{amsmath, amssymb}
+\usepackage{commath}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage[labelformat=simple, labelfont=normalfont]{subcaption}  % Side-by-side figures
+\usepackage[labelfont=sc]{caption}  % Using captionof outside of figure environment
+\usepackage[colorlinks, bookmarks=false, citecolor=black, linkcolor=black, urlcolor=blue]{hyperref}  % Cite colors + autoref
+\usepackage{xurl}  % hypen breaks in urls
+
+\newcommand{\G}{\mathcal{G}}
+\renewcommand{\vec}[1]{\boldsymbol{#1}}
+\newcommand{\vunit}[1]{\ [\si{#1}]}
+\newcommand{\nunit}[1]{\ \si{#1}}
+\newcommand{\avg}[1]{\langle{#1}\rangle}
+
+% braces around equation number in referencing
+\makeatletter
+\let\oldtheequation\theequation
+\renewcommand\tagform@[1]{\maketag@@@{\ignorespaces#1\unskip\@@italiccorr}}
+\renewcommand\theequation{(\oldtheequation)}
+\makeatother
+
+% Prevent latex from streching out paragraph spacings
+\raggedbottom
+
+% braces around subfig number
+\renewcommand\thesubfigure{\,(\alph{subfigure})}
+
+% Smallcaps short autoref
+\newcommand*{\shortautoref}[1]{%
+	\begingroup
+	\def\equationautorefname{\textsc{Eq.}}%
+	\def\tableautorefname{\textsc{Tab.}}%
+	\def\figureautorefname{\textsc{Fig.}}%
+	\autoref{#1}%
+	\endgroup
+}
+
+% Itemize spacing
+\let\olditemize=\itemize
+\let\endolditemize=\enditemize
+\renewenvironment{itemize}{\olditemize \itemsep0em}{\endolditemize}
+
+% subfigure spacing
+\captionsetup[subfigure]{aboveskip=1pt}
+
+\begin{document}
+\title{CS-456 -- Project\\Q-Learning for Tic Tac Toe}
+
+\author{
+	Etienne Objois, Niels Vadot\\
+	\textit{EPFL, Switzerland}
+}
+
+\maketitle
+
+\begin{abstract}
+	proute proute proute
+\end{abstract}
+
+\section{cat kitty cat cat kitty cat cat}
+
+	meow meow meow meow meow meow meow meow meow meow meow meow meow meow 
+	\cite{cs456_source}
+\section{Introduction}
+\section{Q-Learning}
+\subsection*{Question 1}
+
+\begin{figure}
+	\caption{Average reward of Q-learning player for every 50 games. $\epsilon = 0.1$}
+
+	\includegraphics[width = 0.4\textwidth]{figures/q1.png}
+	\label{figure:q1}
+\end{figure}
+
+As seen in ~\ref{figure:q1}, the agent is learning how to play Tic Tac Toe.
+
+\newpage
+\bibliographystyle{IEEEtran}
+\bibliography{literature}
+
+\newpage
+\appendix
+
+	moar uwu
+
+\end{document}
