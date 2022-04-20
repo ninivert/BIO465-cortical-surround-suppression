@@ -1,32 +1,52 @@
 import numpy as np
 from abc import ABC, abstractmethod
-from typing import Union
+from typing import Callable, Union
 
-__all__ = ['Delta', 'Constant']
+__all__ = ['Delta', 'Flat', 'Heaviside']
 
-class Current(ABC):
-	def __add__(self, other: Union[float, 'Current']):
+class FunctionalFunction:
+	"""A functional which implements mathematical operations"""
+
+	def __add__(self, other: Union[float, 'FunctionalFunction']):
 		if isinstance(other, (float, int)):
-			return lambda t: self(t) + other
-		return lambda t: self(t) + other(t)
+			return FunctionalFunction(lambda t: self(t) + other)
+		return FunctionalFunction(lambda t: self(t) + other(t))
 
-	def __mul__(self, other: Union[float, 'Current']):
+	def __sub__(self, other: Union[float, 'FunctionalFunction']):
 		if isinstance(other, (float, int)):
-			return lambda t: self(t) * other
-		return lambda t: self(t) * other(t)
+			return FunctionalFunction(lambda t: self(t) - other)
+		return FunctionalFunction(lambda t: self(t) - other(t))
 
-	def __rmul__(self, *args, **kwargs):
-		return self.__mul__(*args, **kwargs)
+	def __mul__(self, other: Union[float, 'FunctionalFunction']):
+		if isinstance(other, (float, int)):
+			return FunctionalFunction(lambda t: self(t) * other)
+		return FunctionalFunction(lambda t: self(t) * other(t))
+
+	def __div__(self, other: Union[float, 'FunctionalFunction']):
+		if isinstance(other, (float, int)):
+			return FunctionalFunction(lambda t: self(t) / other)
+		return FunctionalFunction(lambda t: self(t) / other(t))
+
+	def __neg__(self):
+		return FunctionalFunction(lambda t: -self(t))
 
 	def __radd__(self, *args, **kwargs):
 		return self.__add__(*args, **kwargs)
 
-	@abstractmethod
+	def __rmul__(self, *args, **kwargs):
+		return self.__mul__(*args, **kwargs)
+
+	def __rsub__(self, *args, **kwargs):
+		return -self.__sub__(*args, **kwargs)
+
 	def __call__(self, t: Union[float, np.ndarray]):
-		pass
+		return self.fn(t)
+
+	def __init__(self, fn: Callable[[Union[float, np.ndarray]], np.ndarray]):
+		self.fn = fn
 
 
-class Delta(Current):
+class Delta(FunctionalFunction):
 	"""Numerical implementation of the Dirac delta using a sharp bump function"""
 
 	# https://www.wolframalpha.com/input?i2d=true&i=Integrate%5Bexp%5C%2840%29-Divide%5B1%2C1-Power%5Bx%2C2%5D%5D%5C%2841%29%2C%7Bx%2C-1%2C1%7D%5D
@@ -57,7 +77,7 @@ class Delta(Current):
 		) / Delta.BUMP_INTEGRAL
 
 
-class Constant(Current):
+class Flat(FunctionalFunction):
 	"""Constant current
 	
 	Parameters
@@ -73,6 +93,26 @@ class Constant(Current):
 		if isinstance(t, (float, int)):
 			return np.copy(self.I0)
 		return np.full((*t.shape, *self.I0.shape), self.I0)
+
+
+class Heaviside(FunctionalFunction):
+	"""Heaviside function
+
+	Parameters
+	----------
+	t0 : float
+		Location of the step
+	"""
+
+	def __init__(self, t0: float):
+		self.t0 = t0
+
+	def __call__(self, t: Union[float, np.ndarray]):
+		return np.where(
+			t - self.t0 < 0,
+			np.zeros_like(t),
+			np.ones_like(t)
+		)
 
 
 if __name__ == '__main__':
