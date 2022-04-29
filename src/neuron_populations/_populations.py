@@ -1,7 +1,7 @@
 import scipy.integrate
 import numpy as np
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, Union
 
 __all__ = ['Populations']
 
@@ -9,8 +9,8 @@ __all__ = ['Populations']
 class Populations:
 	# h: np.ndarray  # input potentials at time t. shape=(K,)
 	W: np.ndarray  # interaction weights. shape=(K, K)
-	tau: np.ndarray  # time constant of population activity
-	R: float  # resistivity
+	tau: Union[np.ndarray, float]  # time constant of population activity, shape=(K,)
+	R: Union[np.ndarray, float]  # resistivity, shape=(K,)
 	gain_fn: Callable[[np.ndarray], np.ndarray]  # F(h) : R^K -> R^K, gain function of each population
 	I_ext: Callable[[float], np.ndarray]  # I_ext(t) : R+ -> R^K, external stimulus
 	# ASSUMPTION : filter_fn is a dirac delta
