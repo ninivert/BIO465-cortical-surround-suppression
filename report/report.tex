@@ -84,7 +84,7 @@
 		\vec{\tau} \odot \dot{\vec h} = -\vec h + \vec R \odot (\mathsf W \vec F(\vec h)) + \vec R \odot \vec{I_{\text{ext}}}
 	\end{equation}
 
-	\shortautoref{eq:model_population} models a population of neurons, but can also be interpreted to model an ensemble of populations. This is assumed from now on, and a more detailed proof and renormalization is given in \shortautoref{sec23}.
+	\shortautoref{eq:model_population} models a population of neurons, but can also be interpreted to model an ensemble of populations. This is assumed from now on, and a more detailed proof and renormalization is given in \shortautoref{sec231}.
 
 \section{Fixed vs. recurrent inhibition}
 \label{sec1}
@@ -222,16 +222,143 @@
 \section{Modeling surround suppression}
 \label{sec2}
 
-		
-
 	\subsection{Network mechanisms of surround suppression}
 	\label{sec21}
+
+		During surround stimulus, neighbouring neurons add negative current contributions to the observed neuron. We can therefore model surround suppression by adding an inhibitory population which adds a negative current to excitatory population. Therefore by increasing the current to the inhibitory population, we are modeling exciting more of the surrounding population.
+
+		We set $W_{00}$ such that the system is always stable, and converges (exponentially) to the stationary solution independantly of the initial condition, as derived in \shortautoref{sec13}. \shortautoref{figure:pop_surroud} simulates surround suppression using an ISN, showing activity of the neurons as well as input currents.
+
+		The recurrent currents scale with the activity of the population. As the activity the excitatory population grows, so does the input current to the inhibitory population, which in term increases the negative current contribution to the excitatory population.
+
+		Lowering $W_{00}$ results in convergence to a lower activity level for both populations. This is expected as from the analytical derivation, as asymptotically, and as shown in \shortautoref{figure:pop_surroud_hf_W00} for the simulation parameters of \shortautoref{figure:pop_surroud}, we have
+	\
+		\begin{equation*}
+			\vec{h_f} =
+			\begin{pmatrix}
+				\frac{2.1}{3-W_{00}}\\
+				\frac{2.475 - 0.475W_{00}}{3-W_{00}}
+			\end{pmatrix}
+			\sim \begin{pmatrix}
+				\frac{1}{W_{00}^\star - W_{00}} \\
+				\frac{1 - W_{00}}{W_{00}^\star - W_{00}}
+			\end{pmatrix}.
+		\end{equation*}
+
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.5\textwidth]{figures/pop_surround.pdf}
+			\caption{Simulation of surround suppression using an ISN. Parameters $W_{10} = 4, W_{01} = -4, W_{11} = -7, R = 1, \vec \tau = (0.06, 0.012), \vec{I_{\text{ext}}} = (4.0, 1.6) \text{ if $t < 1.5$, else } (4.0, 3.8)$.}
+			\label{figure:pop_surroud}
+		\end{figure}
+
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.5\textwidth]{figures/pop_surround_hf_W00.pdf}
+			\caption{Dependency of $\vec{h_f}$ on excitatory self-coupling. Parameters $W_{10} = 4, W_{01} = -4, W_{11} = -7, R = 1, \vec \tau = (0.06, 0.012), \vec{I_{\text{ext}}} = (4.0, 3.6)$.}
+			\label{figure:pop_surroud_hf_W00}
+		\end{figure}
 
 	\subsection{Orientation tuning of surround suppression}
 	\label{sec22}
 
+		Orientation tuning is a consequence of the difference in neuronal receptive fields. For example, some have a receptive field which matches vertical stripes, thus responding strongly to them. If another, different excitation is applied (i.e. horizontal stripes) which doesn't match the receptive field, then the response isn't as strong.
+		
+		In the brain, neurons are often arranged such that neurons with similar receptive fields are spatially close.
+
+		In our excitatory-inhibitory population model, we can model sensitivity to different stimuli as an increase (or decrease) of the input current to the neuron. Surround suppression for cross-oriented stimuli (of the surround population) is therefore modeled as an lower input current $I_1$ than in for iso-oriented stimuli. This has already been simulated in \shortautoref{sec21} : the first half of the simulation has a lower input current (cross-oriented simuli) to the inhibitory population, and the second half has a higher current (iso-oriented simuli), resulting in an activity of the excitatory neuron higher in the first than in the latter.
+
 	\subsection{Surround suppression in networks with bio-plausible connectivity}
 	\label{sec23}
+
+		\subsubsection{Population model renormalization}
+		\label{sec231}
+
+			We denote $[K]$ the ensemble of neurons belonging to the population (multi-)index $K$, and $|K|$ the number of neurons in population $K$
+
+			The voltage, activity and external currents of the "mean field" population (indexed by $K$) composed of neurons $k \in [K]$ can be expressed as
+\
+			\begin{equation*}
+				\begin{aligned}
+					H_K(t) &= \frac{1}{|K|} \sum_{k \in [K]} h_k(t)\\
+					A_K(t) &= \frac{1}{|K|} \sum_{k \in [K]} a_k(t)\\
+					I_{\text{ext},K} &= \frac{1}{|K|} \sum_{k \in [K]} i_{\text{ext},k}(t)
+				\end{aligned}
+			\end{equation*}
+\
+			and modeled by 
+\
+			\begin{equation*}
+				\begin{aligned}
+					T_K \dot H_K(t) &= -H_K(t) \\ &+ R_K \sum_{N} W_{KN} A_N(t) + R_K I_{\text{ext},K}(t).
+				\end{aligned}
+			\end{equation*}
+
+			In the mean-field approximation, we model all neuron $k$ in population $K$ as being the same. Denoting $\mathcal P(k) = K$ as the population multi-index $K$ corresponding to neuron $k$, we substitute to find the equation for the "mean neuron" (all terms in $\sum_{k \in [K]}$ are identical) :
+\
+			\begin{equation*}
+				\begin{aligned}
+					T_{K(k)} \dot h_k(t) &= - h_k(t) \\ &+ R_{K(k)} \sum_N W_{\mathcal P(k),N} \frac{1}{|N|} \sum_{n \in [N]} a_n(t) \\ &+ R_K i_{\text{ext},k}(t)
+				\end{aligned}
+			\end{equation*}
+\
+			Noting $\sum_n = \sum_N \sum_{n \in [N]}$, we simplify
+\
+			\begin{equation*}
+				\begin{aligned}
+					T_{\mathcal P(k)} \dot h_k(t) &= - h_k(t) \\ &+ R_{\mathcal P(k)} \sum_n \frac{1}{|N|} W_{\mathcal P(k),\mathcal P(n)} a_n(t) \\ &+ R_K i_{\text{ext},k}(t).
+				\end{aligned}
+			\end{equation*}
+
+			Imposing the following constraints completes the renormalization :
+\
+			\begin{equation*}
+				\tau_k = T_{\mathcal P(k)}, \quad r_k = R_{\mathcal P(k)}, \quad w_{kn} = \frac{1}{|N|} W_{\mathcal P(k),\mathcal P(n)}
+			\end{equation*}
+
+			This result matches our intuition, as rescaling should leave the inputs to a neuron/population unchanged.
+
+		\subsubsection{Homogeneous renormalization}
+
+			We verify the results from \shortautoref{sec231} by simulating the full population $h_k(t)$ and the corresponding renormalized population $H_{\mathcal P(k)}(t)$. \shortautoref{figure:pop_renorm_single} shows the difference between the potential and its renormalized counterpart in the single population case. The difference is very small, but nonzero due to machine precision. The same verification is performed by repeating the experiment \shortautoref{figure:pop_surroud}, and results are plotted in \shortautoref{figure:pop_renorm_ei}. We note that in this experiment, the system is much more sensitive to large integration timesteps : using the same timestep as for the single population renormalization, the difference creeped up to $10^{-12} \nunit{\volt}$ at the start of the simulation, before quickly dropping down to around $10^{-15} \nunit{\volt}$.
+
+			Since the weight matrix is now a homogeneous block matrix, every neuron in a population is expected to behave exactly in the same way. This has also been asserted numerically.
+
+			\begin{figure}
+				\centering
+				\includegraphics[width=0.5\textwidth]{figures/pop_renorm_single.pdf}
+				\caption{Renormalization check, repeating the same experiment as \shortautoref{figure:pop_single_nonlin}.}
+				\label{figure:pop_renorm_single}
+				\centering
+				\includegraphics[width=0.5\textwidth]{figures/pop_renorm_ei.pdf}
+				\caption{Renormalization check, repeating the same experiment as \shortautoref{figure:pop_surroud}.}
+				\label{figure:pop_renorm_ei}
+			\end{figure}
+
+		\subsubsection{Heterogeneous renormalization}
+
+			Instead of renormalizing homogeneously by transforming $\mathsf W$ into a block matrix, we can make each block random, such that the expectation $\mathbb E(w_{kn}) = \frac{1}{|N|} W_{\mathcal P(k),\mathcal P(n)} =: \mu$.
+			
+			In this case, we sample each block entry $w_{kn}$ following a lognormal distribution (which experimentally models the distribution of synaptic weights) with mean $\mu$ and standard deviation $\alpha \mu$ (in this case, we use $\alpha = 2.75$).
+			Furthermore to capture the sparsity of connections in biological networks, we set each weight to zero with probability $p=0.95$. In order to conserve the correct expectation, we map $\mu \mapsto \mu/p$.
+
+			We repeat the same experiment as in \shortautoref{figure:pop_single_nonlin} with renormalized heterogeneous weights, represented in \shortautoref{figure:pop_renorm_hetero_distribution}. We observe many weights are nearly zero, and only a few neurons have large weights. Simulation results are presented in \shortautoref{figure:pop_renorm_hetero_single}, and show that the simulated neuronal population follows the mean-field results on average, despite a relatively broad standard deviation. The case of $I_{\text{ext}} = -1 \nunit{\ampere}$ has the most difference between models. This is a consequence of the gradient of the sigmoid gain function peaking at $h = 0$, which is the regime in $I_{\text{ext}} = -1$ is located. The further away $h$ is from zero, the tighter the standard deviation will appear.
+
+			\begin{figure}
+				\centering
+				\includegraphics[width=0.5\textwidth]{figures/pop_renorm_hetero_distribution.pdf}
+				\caption{Distribution of nonzero entries and visualization of the heterogeneous weights, for a single population renormalization.}
+				\label{figure:pop_renorm_hetero_distribution}
+			\end{figure}
+
+			\begin{figure}
+				\centering
+				\includegraphics[width=0.5\textwidth]{figures/pop_renorm_hetero_single.pdf}
+				\caption{Renormalized heterogeneous weights, with same parameters as \shortautoref{figure:pop_single_nonlin}. Solid lines are results in the mean-field approximation, dotted lines represent the mean of the simulated neuron population, and shaded areas the standard deviation.}
+				\label{figure:pop_renorm_hetero_single}
+			\end{figure}
+	
+	
 
 % \begin{figure}
 % 	\caption{Average reward of Q-learning player for every 50 games. $\epsilon = 0.1$}
@@ -244,7 +371,7 @@
 \bibliographystyle{IEEEtran}
 \bibliography{literature}
 
-\newpage
+% \newpage
 \appendix
 
 \subsection{Full expression of $\vec{h_f}$ in the linear ISN}
