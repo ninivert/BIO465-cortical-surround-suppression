@@ -65,13 +65,13 @@
 \section{Rate models of neuronal populations}
 
 	A neuronal population is composed of multiple neurons, which can each be individually modeled. In the simple model from \shortautoref{eq:model_neuron}, a neuron is described by the voltage across its membrane $h(t)$, resistivity $R$ to input currents $I(t) = I_{\text{ext}}(t) + I_{\text{network}}(t)$, a relaxation time constant $\tau$, and an activity level $A(t)$ defined in terms of a filter $\alpha(s)$ and gain function $F(h)$ in the equation $A(t) = \int_0^\infty \alpha(s) F(h(t-s)) \dif{s}$.
-
+\
 	\begin{equation} \label{eq:model_neuron}
 		\tau \dot h(t) = -h(t) + R I(t)
 	\end{equation}
 
 	In a population, every neuron is modeled individually according to \shortautoref{eq:model_neuron}, and attributed an index $k$. We furthermore model the network currents linearly as in \shortautoref{eq:model_current}, by introducing a weight parameter $W_{kn}$, which describes the influence of neuron $n$ on neuron $k$.
-
+\
 	\begin{equation} \label{eq:model_current}
 		I_{\text{network},k}(t) = \sum_n W_{kn} A_n(t)
 	\end{equation}
@@ -79,7 +79,7 @@
 	A further simplification can be made by letting $\alpha(s)$ be a very sharp filter, approximatively a Dirac delta. Then $A(t) \approx F(h(t))$.
 
 	We can rewrite the entire system as one equation in matrix form, where $\vec h = (h_1, \cdots, h_n)$, $\vec R = (R_1, \cdots, R_n)$, etc., and $\odot$ is the elementwise product :
-
+\
 	\begin{equation} \label{eq:model_population}
 		\vec{\tau} \odot \dot{\vec h} = -\vec h + \vec R \odot (\mathsf W \vec F(\vec h)) + \vec R \odot \vec{I_{\text{ext}}}
 	\end{equation}
@@ -92,7 +92,7 @@
 	\subsection{Excitatory population with self-coupling}
 	\label{sec11}
 
-		We model a single population according to \shortautoref{eq:model_population}, and assume constant input current $I_{\text{ext}}$. The gain function is defined as $F(h) = \frac 12 (1 + \mathrm{tanh}(h))$.
+		We model a single population according to \shortautoref{eq:model_population}, and assume constant input current $I_{\text{ext}}$. The gain function is defined as $F(h) = \sigma(h) = \frac 12 (1 + \mathrm{tanh}(h))$.
 		
 		The self-coupling appears in the diagonal terms of $\mathsf W$, and in this case there is only self-coupling, since $\mathsf W$ reduces to a scalar.
 
@@ -130,11 +130,99 @@
 			\label{figure:pop_single_threesol}
 		\end{figure}
 
-	\subsection{Inhibition-stabilized network (ISN)}
+	\subsection{Linear rate networks}
 	\label{sec12}
+
+		We specialize \shortautoref{eq:model_population} in the case of a linear rate network, that is $F(h) = \text{Id}(h) = h$. Assuming external current to be independant of time, this equation is of the form $\dot{\vec h} = \Lambda \vec h + \vec b$, where $\Lambda = (1/\vec \tau) \odot (\vec R \odot \mathsf W - \mathrm{Id})$ and $\vec b = (1/\vec \tau) \odot (\vec R \odot \vec{I_{\text{ext}}})$. This can be solved analytically :
+\
+		\begin{equation*}
+			\begin{aligned}
+				& \dot{\vec h} = \Lambda \vec h + \vec b, \; \text{changing variables } \vec y = \Lambda \vec h + \vec b \\
+				\implies & \dot{\vec y} = \Lambda \vec y \implies \dot{\vec y} = \exp(\Lambda t) \vec{y_0}
+			\end{aligned}
+		\end{equation*}
+
+		We can change back variables, denoting the Moore-Penrose inverse $\Lambda^+$, and get the general solution \shortautoref{eq:linear_solution}.
+\
+		\begin{equation} \label{eq:linear_solution}
+			\vec{h}(t) = 
+			\begin{cases}
+				\Lambda^+(\exp(\Lambda t)(\Lambda \vec{h_0} + \vec{b}) - \vec{b}) \; \text{if } \Lambda \neq 0 \\
+				\vec{b} t \; \text{if } \Lambda = 0 \\
+			\end{cases}
+		\end{equation}
+
+		The stability of the solution (in the case $\Lambda \neq 0$) becomes clear by rewriting $\Lambda \vec{h}(t) = \exp(\Lambda t) \vec v - \vec b$, where $\vec v = \Lambda \vec{h_0} + \vec b$. Recall that the eigenspace of $A$ is invariant under matrix exponentiation.
+
+		Components of $\vec{v}$ that lie in an eigenspace associated to $\lambda < 0$ decay exponentially, diverge if $\lambda > 0$, and behave linearly if $\lambda = 0$. This is demonstrated in \shortautoref{figure:pop_single_linear}, where depending on $I_{\text{ext}}$, the activity either stays constant (linear behavior) or diverges to $\pm \infty$ exponentially.
+
+		In a linear rate network, the presence of a inhibitory current is not sufficient to ensure stabilization of a single population, whereas is was sufficient for a nonlinear rate network (in fact, in the case $F(h) = \sigma(h)$ the activity is bounded in $[0, 1]$ so the network is always stable.).
+
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.5\textwidth]{figures/pop_single_linear.pdf}
+			\caption{Simulation of a linear single population. Parameters $W = 2, R = 1, \tau = 0.6, h(0) = 0.5$.}
+			\label{figure:pop_single_linear}
+		\end{figure}
+
+	\subsection{Inhibition-stabilized network (ISN)}
+	\label{sec13}
+
+		We add another population to the network. The weights of the outbound currents (second column of $\mathsf W$) of the new population are negative, such that is can be seen as the inhibitory (I) population. The original population has positive outbound weights (first column of $\mathsf W$), becoming the excitatory (E) population.
+
+		To study stability of the network, we compute the eigenvalues of $\Lambda$ from \shortautoref{sec12}, and find a condition such that they are all negative.
+\
+		\begin{equation*}
+			\Lambda = \begin{pmatrix}\frac{W_{00} - 1}{\tau_{0}} & \frac{W_{01}}{\tau_{0}}\\\frac{W_{10}}{\tau_{1}} & \frac{W_{11} - 1}{\tau_{1}}\end{pmatrix}.
+		\end{equation*}
+
+		We find that both eigenvalues change sign at
+\
+		\begin{equation*}
+			W_{00}^\star = \frac{W_{01} W_{10} + W_{11} - 1}{W_{11} - 1}.
+		\end{equation*}
+
+		Notice that since $W_{11} < 0$, we have $W_{11} \neq 1$ and a stability threshold exists for any $W_{10}, W_{01}, W_{11}$.
+
+		In this case, we can substitute $W_{10} = 4, W_{01} = -4, W_{11} = -7$ and find the system is stable when $W_{00} < W_{00}^\star = 3$. It diverges for $W_{00} > W_{00}^\star$ and evolves linearly when $W_{00} = W_{00}^\star$ (both eigenvalues are null with the same condition).
+
+		The numerical simulations (setting $W_{10} = 4$, $I_0 = 4.0$, $I_1 = 6.0$) shown in \shortautoref{figure:pop_ei_linear} confirm the analytical derivations. In the converging case $W_{00} = 2.8 < W_{00}^\star = 3.0$, the excitatory activity converges to $A = 5 \; \text{Hz}$, and the inhibitory activity converges to $A = 3.25 \; \text{Hz}$.
+
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.5\textwidth]{figures/pop_ei_linear.pdf}
+			\caption{Simulation of a linear ISN. Parameters $W_{10} = 4, W_{01} = -4, W_{11} = -7, R = 1, \vec \tau = (0.06, 0.012), \vec{h}(0) = (0,0), \vec{I_{\text{ext}}} = (4.0, 6.0)$.}
+			\label{figure:pop_ei_linear}
+		\end{figure}
+
+		We denote $\vec{h_f} = \Lambda^+ \vec{b}$ (see \shortautoref{sec:hf_full}) the value to which $\vec{h}$ converges. It depends on $W$, $\vec{I_{\text{ext}}}$, and more surprisingly $\vec \tau$. In the case of one population, there was no "competition" and the system can converge at any speed. In the case of two populations, the competition means that now the rate of convergence matters. $\vec{h_f}$ is of the form, where $\text{cst}$ terms are functions of $\mathsf W$ and $\vec \tau$ :
+\
+		\begin{equation*}
+			\vec{h_f} = \begin{pmatrix}
+				\text{cst} \cdot I_0 + \text{cst} \cdot I_1 \\
+				\text{cst} \cdot I_0 + \text{cst} \cdot I_1
+			\end{pmatrix}.
+		\end{equation*}
+
+		The f-I curve shown in \shortautoref{figure:pop_ei_linear_fI} is linear, as expected from the form of $\vec{h_f}$. Stronger excitatory self-couplings of the E population are associated to a steeper line.
+		Compared to the linear excitatory-only network which (nearly) always diverges exponentially, the addition of an inhibitory population allows for the existence of stable regimes.
+		This shows that constant inhibitory current is not enough to stabilize the system, it needs to scale with the activity of the excitatory population, as it does here.
+
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.5\textwidth]{figures/pop_ei_linear_fI.pdf}
+			\caption{Simulation of a linear ISN. Parameters $W_{10} = 4, W_{01} = -4, W_{11} = -7, R = 1, \vec \tau = (0.06, 0.012), \vec{I_{\text{ext}}} = (4.0, 6.0)$.}
+			\label{figure:pop_ei_linear_fI}
+		\end{figure}
+
+		This linear analysis extends to the sigmoidal gain function $F(h) = \sigma(h)$ in the case of a small potential $h$ (after some rescaling), since $\sigma(h) = \frac 12 + \frac h2 + \mathcal{O}(h^3) \approx \text{Id}(\frac {h+1}{2})$.
+
+		
 
 \section{Modeling surround suppression}
 \label{sec2}
+
+		
 
 	\subsection{Network mechanisms of surround suppression}
 	\label{sec21}
@@ -156,9 +244,18 @@
 \bibliographystyle{IEEEtran}
 \bibliography{literature}
 
-% \newpage
-% \appendix
+\newpage
+\appendix
 
-% 	moar uwu
+\subsection{Full expression of $\vec{h_f}$ in the linear ISN}
+\label{sec:hf_full}
+
+\begin{equation*} \label{eq:hf_full}
+	\begin{aligned}
+		h_{f0} &= - \frac{I_{0} \left(W_{11} \tau_{0} - \tau_{0}\right)}{\tau_{0} \left(W_{00} W_{11} - W_{00} - W_{01} W_{10} - W_{11} + 1\right)} \\ &+\frac{I_{1} W_{01}}{W_{00} W_{11} - W_{00} - W_{01} W_{10} - W_{11} + 1}\\
+		h_{f1} &= \frac{I_{0} W_{10}}{W_{00} W_{11} - W_{00} - W_{01} W_{10} - W_{11} + 1} \\ &- \frac{I_{1} \left(W_{00} \tau_{1} - \tau_{1}\right)}{\tau_{1} \left(W_{00} W_{11} - W_{00} - W_{01} W_{10} - W_{11} + 1\right)}
+	\end{aligned}
+\end{equation*}
+
 
 \end{document}
