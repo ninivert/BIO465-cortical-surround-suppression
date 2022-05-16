@@ -55,4 +55,4 @@ def data_lim(ax: matplotlib.axes.Axes, which = AxisWhich.BOTH):
 
 def data_tick(ax: matplotlib.axes.Axes, which = AxisWhich.BOTH):
 	# TODO
-	raise NotADirectoryError()
+	raise NotImplementedError()

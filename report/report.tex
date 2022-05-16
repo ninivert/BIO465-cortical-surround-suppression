@@ -59,7 +59,7 @@
 	We explore neuronal population models and use them to model cortical surround suppression.
 	Cortical surround suppression is a phenomenon where the presence of nearby neighbours causes a neuron to have a lower activity level than if it were alone.
 	We also expore the orientation tuning phenomenon, where the surround suppression is more or less strong, depending on the overlap between the external stimulus and the receptive fields.
-	The source code is available at \cite{cs456_source}.
+	% The source code is available at \cite{bio465_source}.
 \end{abstract}
 
 \section{Rate models of neuronal populations}
@@ -268,6 +268,17 @@
 
 		In our excitatory-inhibitory population model, we can model sensitivity to different stimuli as an increase (or decrease) of the input current to the neuron. Surround suppression for cross-oriented stimuli (of the surround population) is therefore modeled as an lower input current $I_1$ than in for iso-oriented stimuli. This has already been simulated in \shortautoref{sec21} : the first half of the simulation has a lower input current (cross-oriented simuli) to the inhibitory population, and the second half has a higher current (iso-oriented simuli), resulting in an activity of the excitatory neuron higher in the first than in the latter.
 
+		We study orientation tuning by changing letting the populations stabilize, and then applying a step current to the inhibitory population. From \shortautoref{sec13}, we know that the population activity is linear in both $I_0$ and $I_1$, and numerically we see in \shortautoref{figure:pop_surround_kink_Af} that increasing $I_1$ increases the inhibitory activity increases and describes the excitatory activity.
+
+		We also notice that during the transient, the inhibitory activity tends to ``overshoot'' the stable activity. The relative kink height, that is the difference between this overshoot and the final activity is plotted on \shortautoref{figure:pop_surround_kink_Af}. The kink seems linear in the step size $\Delta I_1$, and intersects the origin, which is intuitive, since we don't expect a change if the current stays the same. If the step size is positive (current increased over transition), then the kink is positive, and vice-versa for the negative case. Larger steps result in larger kinks. Note that this is not an artifact of numerical integration, since changing the integration timestep has no effect. The kink also does not violate the analytical solution, which assumed constant current (and the numerical solution does behave like the analytical outside of the transition region, where current is constant).
+
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.5\textwidth]{figures/pop_surround_kink_Af.pdf}
+			\caption{Kink in the reaction of the inhibitory population to a step current, starting from stationary $I_1 = 0$. The height is relative to the inhib. activity after stabilization. The stabilized population activity is also shown. Parameters $W_{00} = 0.1, W_{10} = 4, W_{01} = -4, W_{11} = -7, R = 1, \vec \tau = (0.06, 0.012), \vec{I_{\text{ext}}} = (4.0, I_1)$.}
+			\label{figure:pop_surround_kink_Af}
+		\end{figure}
+
 	\subsection{Surround suppression in networks with bio-plausible connectivity}
 	\label{sec23}
 
@@ -331,7 +342,7 @@
 				\label{figure:pop_renorm_single}
 				\centering
 				\includegraphics[width=0.5\textwidth]{figures/pop_renorm_ei.pdf}
-				\caption{Renormalization check, repeating the same experiment as \shortautoref{figure:pop_surroud}.}
+				\caption{Renormalization check, repeating the same experiment as \shortautoref{figure:pop_surroud}, with $W_{00}=0.5$.}
 				\label{figure:pop_renorm_ei}
 			\end{figure}
 
@@ -343,6 +354,10 @@
 			Furthermore to capture the sparsity of connections in biological networks, we set each weight to zero with probability $p=0.95$. In order to conserve the correct expectation, we map $\mu \mapsto \mu/p$.
 
 			We repeat the same experiment as in \shortautoref{figure:pop_single_nonlin} with renormalized heterogeneous weights, represented in \shortautoref{figure:pop_renorm_hetero_distribution}. We observe many weights are nearly zero, and only a few neurons have large weights. Simulation results are presented in \shortautoref{figure:pop_renorm_hetero_single}, and show that the simulated neuronal population follows the mean-field results on average, despite a relatively broad standard deviation. The case of $I_{\text{ext}} = -1 \nunit{\ampere}$ has the most difference between models. This is a consequence of the gradient of the sigmoid gain function peaking at $h = 0$, which is the regime in $I_{\text{ext}} = -1$ is located. The further away $h$ is from zero, the tighter the standard deviation will appear.
+
+			Finally, we repeat the surround suppression experiment with the heterogeneous population. Results are plotted in \shortautoref{figure:pop_renorm_hetero_ei}. In the homogeneous case, the stability condition derived in \shortautoref{sec13} was still valid since $\mathsf W$ is just a block matrix. However, this condition is not guaranteed to hold in block-expectation (this is a less strong assumption), and a sigmoid gain function had to be used to cap the activity. In order to garantee stability, the eigenvalues of the weight matrix need to be all negative, which is very unlikely on a large randomly generated matrix.
+
+			Compared to the single heterogeneous population case, the EI population is a lot more noisy, the "one-sigma around average" neurons nearly span the entire activity range, but the average still roughly follows the mean-field approximation, such that surround suppression is still observed (although less strong).
 
 			\begin{figure}
 				\centering
@@ -357,8 +372,22 @@
 				\caption{Renormalized heterogeneous weights, with same parameters as \shortautoref{figure:pop_single_nonlin}. Solid lines are results in the mean-field approximation, dotted lines represent the mean of the simulated neuron population, and shaded areas the standard deviation.}
 				\label{figure:pop_renorm_hetero_single}
 			\end{figure}
+
+			\begin{figure}
+				\centering
+				\includegraphics[width=0.5\textwidth]{figures/pop_renorm_hetero_ei.pdf}
+				\caption{Renormalized heterogeneous weights, with same parameters as \shortautoref{figure:pop_surroud}, with $W_{00}=0.1$, and sigmoid gain function. Solid lines are results in the mean-field approximation, dotted lines represent the mean of the simulated neuron population, and shaded areas the standard deviation.}
+				\label{figure:pop_renorm_hetero_ei}
+			\end{figure}
+
+\section{Conclusion}
+
+	We have studied rate models of neuronal populations, implemented numerical integration of the rate equations, and tested the models.
+	First a single nonlinear population was studied, and conditions were derived for the existence of one or three fixed points. Then, it was seen that a single linear is unstable.
 	
-	
+	To adress instability of linear networks, an inhibitory population was introduced, an analytical solution derived, and a condition was found on excitatory self-coupling such that the system remained stable. This EI system was then used to model surround suppression, and the behavior as a function of "orientation" (interpreted as current to the inhibitory population) was studied.
+
+	Finally, a renormalization was performed, which allowed to verify the validity of the mean-field approximation, upon which the population rate models were based. The previous experiments were repeated with homogeneous and heterogeneous weights, and it was found that bio-plausible networks (heterogeneous weights and sparse connections) can be coarsely modeled by the mean field approximation, can exhibit surround suppression, but are much more noisy and difficult to stabilize.
 
 % \begin{figure}
 % 	\caption{Average reward of Q-learning player for every 50 games. $\epsilon = 0.1$}
@@ -367,11 +396,11 @@
 % 	\label{figure:q1}
 % \end{figure}
 
-\newpage
-\bibliographystyle{IEEEtran}
-\bibliography{literature}
-
 % \newpage
+% \bibliographystyle{IEEEtran}
+% \bibliography{literature}
+
+\newpage
 \appendix
 
 \subsection{Full expression of $\vec{h_f}$ in the linear ISN}
