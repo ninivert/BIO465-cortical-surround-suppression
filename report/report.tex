@@ -110,7 +110,7 @@
 			\label{figure:pop_single_nonlin}
 		\end{figure}
 
-		In order to get insight into the behavior of the coupling strength, \shortautoref{figure:pop_single_nonlin_phase} shows a 1D phase plot of the differential equation. Fixed points solutions to $\dot h = 0$. $I_{\text{ext}}$ controls the vertical offset of the curves but more interestingly $W$ controls the appearance of two local extrema, and therefore the possibility of two other solutions. This happens when the curvature changes sign, and critically when the derivative is null. Solving $\partial^2_h \dot h = 0$ and $\partial_h \dot h = 0$ for $h$ and $W$, we find $h_{\text{crit}} = 0$ and $W_{\text{crit}} = 2/R$. When $W < W_{\text{crit}}$, only one stable solution exists. When $W > W_{\text{crit}}$, three solutions can exist (two stable, and one unstable at $h = 0$) depending on the value of $I_{ext}$.
+		In order to get insight into the behavior of the coupling strength, \shortautoref{figure:pop_single_nonlin_phase} shows a 1D phase plot of the differential equation. Fixed points solutions to $\dot h = 0$. $I_{\text{ext}}$ controls the vertical offset of the curves but more interestingly $W$ controls the appearance of two local extrema, and therefore the possibility of two other solutions. This happens when the curvature changes sign, and critically when the derivative is null. Solving $\partial^2_h \dot h = 0$ and $\partial_h \dot h = 0$ for $h$ and $W$, we find $h_{\text{crit}} = 0$ and $W_{\text{crit}} = 2/R$. When $W < W_{\text{crit}}$, only one stable solution exists. When $W > W_{\text{crit}}$, three solutions can exist (two stable, and one unstable at $h = 0$) depending on the value of $I_{\text{ext}}$.
 		
 		If we furthermore impose $\dot h = 0$ at the critical value, then we get $I_{\text{crit}} = -1/R$. When $I < I_{\text{crit}}$, the three solutions can exist (provided the current is not too negative), whereas when $I > I_{\text{crit}}$ only one solution exists.
 
@@ -195,7 +195,7 @@
 			\label{figure:pop_ei_linear}
 		\end{figure}
 
-		We denote $\vec{h_f} = \Lambda^+ \vec{b}$ (see \shortautoref{sec:hf_full}) the value to which $\vec{h}$ converges. It depends on $W$, $\vec{I_{\text{ext}}}$, and more surprisingly $\vec \tau$. In the case of one population, there was no "competition" and the system can converge at any speed. In the case of two populations, the competition means that now the rate of convergence matters. $\vec{h_f}$ is of the form, where $\text{cst}$ terms are functions of $\mathsf W$ and $\vec \tau$ :
+		We denote $\vec{h_f} = \Lambda^+ \vec{b}$ (see \shortautoref{sec:hf_full}) the value to which $\vec{h}$ converges. It depends on $\mathsf W$, $\vec{I_{\text{ext}}}$, and more surprisingly $\vec \tau$. In the case of one population, there was no "competition" and the system can converge at any speed. In the case of two populations, the competition means that now the rate of convergence matters. $\vec{h_f}$ is of the form, where $\text{cst}$ terms are functions of $\mathsf W$ and $\vec \tau$ :
 \
 		\begin{equation*}
 			\vec{h_f} = \begin{pmatrix}
@@ -225,7 +225,7 @@
 	\subsection{Network mechanisms of surround suppression}
 	\label{sec21}
 
-		During surround stimulus, neighbouring neurons add negative current contributions to the observed neuron. We can therefore model surround suppression by adding an inhibitory population which adds a negative current to excitatory population. Therefore by increasing the current to the inhibitory population, we are modeling exciting more of the surrounding population.
+		During surround stimulus, neighbouring neurons add negative current contributions to the observed neuron. We can therefore model surround suppression by adding an inhibitory population which adds a negative current to the excitatory population. Therefore by increasing the current to the inhibitory population, we are modeling an increased excitation of the surrounding population.
 
 		We set $W_{00}$ such that the system is always stable, and converges (exponentially) to the stationary solution independantly of the initial condition, as derived in \shortautoref{sec13}. \shortautoref{figure:pop_surroud} simulates surround suppression using an ISN, showing activity of the neurons as well as input currents.
 
@@ -266,9 +266,9 @@
 		
 		In the brain, neurons are often arranged such that neurons with similar receptive fields are spatially close.
 
-		In our excitatory-inhibitory population model, we can model sensitivity to different stimuli as an increase (or decrease) of the input current to the neuron. Surround suppression for cross-oriented stimuli (of the surround population) is therefore modeled as an lower input current $I_1$ than in for iso-oriented stimuli. This has already been simulated in \shortautoref{sec21} : the first half of the simulation has a lower input current (cross-oriented simuli) to the inhibitory population, and the second half has a higher current (iso-oriented simuli), resulting in an activity of the excitatory neuron higher in the first than in the latter.
+		In our excitatory-inhibitory population model, we can model sensitivity to different stimuli as an increase (or decrease) of the input current to the neuron. Surround suppression for cross-oriented stimuli (of the surround population) is therefore modeled as a lower input current $I_1$ than in for iso-oriented stimuli. This has already been simulated in \shortautoref{sec21} : the first half of the simulation has a lower input current (cross-oriented simuli) to the inhibitory population, and the second half has a higher current (iso-oriented simuli), resulting in an activity of the excitatory neuron higher in the first than in the latter.
 
-		We study orientation tuning by changing letting the populations stabilize, and then applying a step current to the inhibitory population. From \shortautoref{sec13}, we know that the population activity is linear in both $I_0$ and $I_1$, and numerically we see in \shortautoref{figure:pop_surround_kink_Af} that increasing $I_1$ increases the inhibitory activity increases and describes the excitatory activity.
+		We study orientation tuning by letting the populations stabilize, and then applying a step current to the inhibitory population. From \shortautoref{sec13}, we know that the population activity is linear in both $I_0$ and $I_1$, and numerically we see in \shortautoref{figure:pop_surround_kink_Af} that increasing $I_1$ increases the inhibitory activity, and decreases the excitatory activity.
 
 		We also notice that during the transient, the inhibitory activity tends to ``overshoot'' the stable activity. The relative kink height, that is the difference between this overshoot and the final activity is plotted on \shortautoref{figure:pop_surround_kink_Af}. The kink seems linear in the step size $\Delta I_1$, and intersects the origin, which is intuitive, since we don't expect a change if the current stays the same. If the step size is positive (current increased over transition), then the kink is positive, and vice-versa for the negative case. Larger steps result in larger kinks. Note that this is not an artifact of numerical integration, since changing the integration timestep has no effect. The kink also does not violate the analytical solution, which assumed constant current (and the numerical solution does behave like the analytical outside of the transition region, where current is constant).
 
@@ -305,11 +305,11 @@
 				\end{aligned}
 			\end{equation*}
 
-			In the mean-field approximation, we model all neuron $k$ in population $K$ as being the same. Denoting $\mathcal P(k) = K$ as the population multi-index $K$ corresponding to neuron $k$, we substitute to find the equation for the "mean neuron" (all terms in $\sum_{k \in [K]}$ are identical) :
+			In the mean-field approximation, we model all neurons $k$ in population $K$ as being the same. Denoting $\mathcal P(k) = K$ as the population multi-index $K$ corresponding to neuron $k$, we substitute to find the equation for the "mean neuron" (all terms in $\sum_{k \in [K]}$ are identical) :
 \
 			\begin{equation*}
 				\begin{aligned}
-					T_{K(k)} \dot h_k(t) &= - h_k(t) \\ &+ R_{K(k)} \sum_N W_{\mathcal P(k),N} \frac{1}{|N|} \sum_{n \in [N]} a_n(t) \\ &+ R_K i_{\text{ext},k}(t)
+					T_{\mathcal P(k)} \dot h_k(t) &= - h_k(t) \\ &+ R_{\mathcal P(k)} \sum_N W_{\mathcal P(k),N} \frac{1}{|N|} \sum_{n \in [N]} a_n(t) \\ &+ R_{\mathcal P(k)} i_{\text{ext},k}(t)
 				\end{aligned}
 			\end{equation*}
 \
@@ -317,7 +317,7 @@
 \
 			\begin{equation*}
 				\begin{aligned}
-					T_{\mathcal P(k)} \dot h_k(t) &= - h_k(t) \\ &+ R_{\mathcal P(k)} \sum_n \frac{1}{|N|} W_{\mathcal P(k),\mathcal P(n)} a_n(t) \\ &+ R_K i_{\text{ext},k}(t).
+					T_{\mathcal P(k)} \dot h_k(t) &= - h_k(t) \\ &+ R_{\mathcal P(k)} \sum_n \frac{1}{|N|} W_{\mathcal P(k),\mathcal P(n)} a_n(t) \\ &+ R_{\mathcal P(k)} i_{\text{ext},k}(t).
 				\end{aligned}
 			\end{equation*}
 
@@ -351,7 +351,7 @@
 			Instead of renormalizing homogeneously by transforming $\mathsf W$ into a block matrix, we can make each block random, such that the expectation $\mathbb E(w_{kn}) = \frac{1}{|N|} W_{\mathcal P(k),\mathcal P(n)} =: \mu$.
 			
 			In this case, we sample each block entry $w_{kn}$ following a lognormal distribution (which experimentally models the distribution of synaptic weights) with mean $\mu$ and standard deviation $\alpha \mu$ (in this case, we use $\alpha = 2.75$).
-			Furthermore to capture the sparsity of connections in biological networks, we set each weight to zero with probability $p=0.95$. In order to conserve the correct expectation, we map $\mu \mapsto \mu/p$.
+			Furthermore to capture the sparsity of connections in biological networks, we set each weight to zero with probability $p=0.95$. In order to conserve the correct expectation, we map $\mu \mapsto \mu/(1-p)$.
 
 			We repeat the same experiment as in \shortautoref{figure:pop_single_nonlin} with renormalized heterogeneous weights, represented in \shortautoref{figure:pop_renorm_hetero_distribution}. We observe many weights are nearly zero, and only a few neurons have large weights. Simulation results are presented in \shortautoref{figure:pop_renorm_hetero_single}, and show that the simulated neuronal population follows the mean-field results on average, despite a relatively broad standard deviation. The case of $I_{\text{ext}} = -1 \nunit{\ampere}$ has the most difference between models. This is a consequence of the gradient of the sigmoid gain function peaking at $h = 0$, which is the regime in $I_{\text{ext}} = -1$ is located. The further away $h$ is from zero, the tighter the standard deviation will appear.
 
@@ -383,7 +383,7 @@
 \section{Conclusion}
 
 	We have studied rate models of neuronal populations, implemented numerical integration of the rate equations, and tested the models.
-	First a single nonlinear population was studied, and conditions were derived for the existence of one or three fixed points. Then, it was seen that a single linear is unstable.
+	First a single nonlinear population was studied, and conditions were derived for the existence of one or three fixed points. Then, it was seen that a single linear population is inherently unstable.
 	
 	To adress instability of linear networks, an inhibitory population was introduced, an analytical solution derived, and a condition was found on excitatory self-coupling such that the system remained stable. This EI system was then used to model surround suppression, and the behavior as a function of "orientation" (interpreted as current to the inhibitory population) was studied.
 
